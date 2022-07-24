@@ -25,8 +25,7 @@ class EmailRequesAuto:
         self.unread_msgs = []
 
     def start_driver(self):
-        self.driver = webdriver.Chrome(
-            service=Service(ChromeDriverManager().install()))
+        self.driver = webdriver.Chrome()
         self.driver.get(self.url)
 
     def tearDown(self):
@@ -52,7 +51,7 @@ class EmailRequesAuto:
             EC.presence_of_element_located((By.ID, 'messagelist')))
         tablebody = table.find_element(By.TAG_NAME, "tbody")
         listOFUnreadMsg = tablebody.find_elements(
-            By.CSS_SELECTOR, 'tr.message')
+            By.CSS_SELECTOR, 'tr.message.unread')
         for msg in listOFUnreadMsg:
             if "Hello there!" in msg.find_element(By.CSS_SELECTOR,
                                                   "span.subject a span").text:
@@ -85,12 +84,10 @@ class EmailRequesAuto:
         temp_csv_path = self.config.get("csv", 'tempmail')
         temp_csv = pd.read_csv(temp_csv_path, sep=",")
         jaiza_csv = pd.read_csv(jaiza_csv_path, sep=";")
-
         jaiza_csv["login_mails"] = temp_csv.mail.str.cat(temp_csv.provider)
         jaiza_csv["phone_number"] = temp_csv["phone number"]
         jaiza_csv["password"] = temp_csv["pswd"]
         jaiza_csv.to_csv("./csv_final.csv", sep=";")
-
 
 if __name__ == '__main__':
     em = EmailRequesAuto()
